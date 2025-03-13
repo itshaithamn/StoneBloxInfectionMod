@@ -1,0 +1,4 @@
+name: HelloWorld
+version: 1.0.0
+main: HelloWorld
+api-version: 1.20
