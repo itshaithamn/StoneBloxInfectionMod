@@ -1,41 +1,28 @@
 package io.github.itshaithamn.infection;
 
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import static org.bukkit.Bukkit.broadcastMessage;
-import static org.bukkit.Bukkit.getPlayer;
-
-/**
- * Hello world!
- *
- */
-public class HelloWorld extends JavaPlugin {
-
+public class HelloWorld extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
-        super.onEnable();
-        getServer().getPluginManager().registerEvents(new PluginEventHandler(), this);
+        Bukkit.getPluginManager().registerEvents(this, this);
     }
 
     @Override
     public void onDisable() {
-        super.onDisable();
+        Bukkit.getPluginManager().disablePlugin(this);
     }
 
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (command.getName().equalsIgnoreCase("helloworld")) {
-            Player player = getPlayer(sender.getName());
-            player.sendMessage(new ComponentBuilder("Hello, World!").color(ChatColor.AQUA).create());
-            return true;
-        } else {
-            return false;
-        }
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        String playerName = event.getPlayer().getName();
+
+        Component message = Component.text(playerName + " has joined the world!");
+        Bukkit.broadcast(message);
     }
 }

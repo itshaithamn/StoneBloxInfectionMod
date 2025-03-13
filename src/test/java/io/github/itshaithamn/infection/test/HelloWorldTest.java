@@ -7,24 +7,40 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockbukkit.mockbukkit.MockBukkit;
 import org.mockbukkit.mockbukkit.ServerMock;
+import org.mockbukkit.mockbukkit.entity.PlayerMock;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class HelloWorldTest {
     private ServerMock server;
-    private HelloWorld helloWorld;
+    private HelloWorld plugin;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
+        // Initialize MockBukkit and load the plugin
         server = MockBukkit.mock();
-        helloWorld = new HelloWorld();
+        plugin = (HelloWorld) MockBukkit.load(HelloWorld.class);
     }
 
     @AfterEach
-    public void tearDown() {
+    void tearDown() {
+        // Clean up MockBukkit after each test
         MockBukkit.unmock();
     }
 
     @Test
-    public void test() {
-        assert(true);
+    void testPluginLoads() {
+        // Verify the plugin is loaded and enabled
+        assertNotNull(plugin, "Plugin should not be null");
+        assertTrue(plugin.isEnabled(), "Plugin should be enabled");
+    }
+
+    @Test
+    void testOnPlayerJoinEvent() {
+        // Add a mock player
+        PlayerMock player = server.addPlayer("TestPlayer");
+
+        assertTrue(player.nextMessage().contains("TestPlayer has joined the world!"));
     }
 }
