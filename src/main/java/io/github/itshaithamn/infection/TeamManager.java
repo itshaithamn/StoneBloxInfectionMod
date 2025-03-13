@@ -5,23 +5,37 @@ import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
-public class TeamManager {
+interface TeamManager {
+    createTeam createTeams();
+}
+
+class createTeam implements TeamManager {
+    private Scoreboard scoreboard;
     private Team infected;
     private Team survivors;
-    private Scoreboard scoreboard;
 
-    public void createTeams() {
-        Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+    @Override
+    public createTeam createTeams() {
+        this.scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         this.infected = scoreboard.registerNewTeam("infected");
         this.survivors = scoreboard.registerNewTeam("survivors");
+
+        return this;
     }
 
-    public void addPlayer(Player player, Team teamChoice) {
-        teamChoice.addEntry(player.getName());
+    public void addPlayerInfected(Player player) {
+        infected.addEntry(player.getName());
     }
 
-    public void removePlayer(Player player, Team teamChoice) {
-        teamChoice.addEntry(player.getName());
+    public void removePlayerInfected(Player player) {
+        infected.removeEntry(player.getName());
     }
 
+    public void addPlayerSurvivors(Player player) {
+        survivors.addEntry(player.getName());
+    }
+
+    public void removePlayerSurvivors(Player player) {
+        survivors.removeEntry(player.getName());
+    }
 }
