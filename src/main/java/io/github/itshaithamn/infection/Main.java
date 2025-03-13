@@ -1,16 +1,19 @@
 package io.github.itshaithamn.infection;
 
-import net.kyori.adventure.text.Component;
+import io.github.itshaithamn.infection.comands.InfectedCommand;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Nullable;
 
-public class HelloWorld extends JavaPlugin implements Listener {
+public class Main extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         Bukkit.getPluginManager().registerEvents(this, this);
+        getCommand("infected").setExecutor(new InfectedCommand());
     }
 
     @Override
@@ -20,9 +23,5 @@ public class HelloWorld extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        String playerName = event.getPlayer().getName();
-
-        Component message = Component.text(playerName + " has joined the world!");
-        Bukkit.broadcast(message);
     }
 }

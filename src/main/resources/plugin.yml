@@ -1,4 +1,12 @@
 name: HelloWorld
 version: 1.0.0
-main: io.github.itshaithamn.infection.HelloWorld
+main: io.github.itshaithamn.infection.Main
 api-version: 1.20
+
+commands:
+  infection:
+    description: Starts the infection gamemode
+    aliases:
+      - infected
+      - zombies
+      - i

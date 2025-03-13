@@ -1,7 +1,7 @@
 package io.github.itshaithamn.infection.test;
 
 
-import io.github.itshaithamn.infection.HelloWorld;
+import io.github.itshaithamn.infection.Main;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,13 +14,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class HelloWorldTest {
     private ServerMock server;
-    private HelloWorld plugin;
+    private Main plugin;
 
     @BeforeEach
     void setUp() {
         // Initialize MockBukkit and load the plugin
         server = MockBukkit.mock();
-        plugin = (HelloWorld) MockBukkit.load(HelloWorld.class);
+        plugin = (Main) MockBukkit.load(Main.class);
     }
 
     @AfterEach
