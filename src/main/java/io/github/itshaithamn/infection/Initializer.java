@@ -34,4 +34,6 @@ public class Initializer implements TeamManager {
     public void removePlayerSurvivors(Player player) {
         survivors.removeEntry(player.getName());
     }
+
+    public void getScoreboardPlayers() {scoreboard.getEntries();}
 }
