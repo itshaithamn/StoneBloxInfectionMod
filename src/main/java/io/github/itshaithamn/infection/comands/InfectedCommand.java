@@ -1,5 +1,7 @@
 package io.github.itshaithamn.infection.comands;
 
+import io.github.itshaithamn.infection.Initializer;
+import io.github.itshaithamn.infection.TeamManager;
 import io.papermc.paper.chat.ChatRenderer;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -11,12 +13,17 @@ import org.jetbrains.annotations.NotNull;
 
 public class InfectedCommand implements CommandExecutor, ChatRenderer {
 
+    public TeamManager teamManager;
+
+    public InfectedCommand(TeamManager teamManager) {
+        this.teamManager = teamManager;
+    }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String @NotNull [] strings) {
-        Player player = (Player) commandSender;
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
+        Player player = (Player) sender;
 
-        if (!(commandSender instanceof Player)){
+        if (!(sender instanceof Player)){
             Component playerName = Component.text(player.getName());
             Component message = Component.text("You must be a player to use this command");
             Audience audience = Audience.audience(player);
@@ -25,8 +32,10 @@ public class InfectedCommand implements CommandExecutor, ChatRenderer {
             return true;
         }
 
-
-
+        teamManager = new Initializer();
+        teamManager.createTeams();
+        teamManager.addPlayerInfected(player);
+        player.sendMessage(Component.text("You are now on the infected team."));
         return true;
     }
 
