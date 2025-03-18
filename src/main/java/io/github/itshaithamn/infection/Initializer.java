@@ -8,32 +8,56 @@ import org.bukkit.scoreboard.Team;
 public class Initializer implements TeamManager {
     private Scoreboard scoreboard;
     private Team infected;
-    private Team survivors;
+    private Team survivor;
 
-    @Override
-    public Initializer createTeams() {
+    public Initializer() {
+        Bukkit.getLogger().info("§aInitializing teams...");
         this.scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
-        this.infected = scoreboard.registerNewTeam("infected");
-        this.survivors = scoreboard.registerNewTeam("survivors");
-
-        return this;
+        loadTeams();
     }
 
-    public void addPlayerInfected(Player player) {
-        infected.addEntry(player.getName());
+    public Scoreboard getScoreboard() {
+        return scoreboard;
+    }
+
+    private void loadTeams() {
+        infected = getOrCreateTeam("infected");
+        survivor = getOrCreateTeam("survivors");
+    }
+
+    private Team getOrCreateTeam(String teamName) {
+        Team team = scoreboard.getTeam(teamName);
+        if (team == null) {
+            team = scoreboard.registerNewTeam(teamName);
+        }
+        return team;
+    }
+
+    public Team getInfectedTeam() {
+        return infected;
+    }
+
+    public Team getSurvivorsTeam() {
+        return survivor;
+    }
+
+    public void addPlayertoTeam(String teamName, String player) {
+        Team team = scoreboard.getTeam(teamName);
+        team.addEntry(player);
+    }
+
+    public boolean verifyPlayer(String player) {
+        Player target = Bukkit.getPlayer(player);
+        return target != null;
     }
 
     public void removePlayerInfected(Player player) {
-        infected.removeEntry(player.getName());
-    }
-
-    public void addPlayerSurvivors(Player player) {
-        survivors.addEntry(player.getName());
+        this.infected.removeEntry(player.getName());
     }
 
     public void removePlayerSurvivors(Player player) {
-        survivors.removeEntry(player.getName());
+        this.survivor.removeEntry(player.getName());
     }
 
-    public void getScoreboardPlayers() {scoreboard.getEntries();}
+    public String getScoreboardPlayers() {return this.scoreboard.getEntries().toString();}
 }

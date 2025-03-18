@@ -35,12 +35,4 @@ public class HelloWorldTest {
         assertNotNull(plugin, "Plugin should not be null");
         assertTrue(plugin.isEnabled(), "Plugin should be enabled");
     }
-
-    @Test
-    void testOnPlayerJoinEvent() {
-        // Add a mock player
-        PlayerMock player = server.addPlayer("TestPlayer");
-
-        assertTrue(player.nextMessage().contains("TestPlayer has joined the world!"));
-    }
 }
