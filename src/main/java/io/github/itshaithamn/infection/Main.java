@@ -1,17 +1,27 @@
 package io.github.itshaithamn.infection;
 
 import io.github.itshaithamn.infection.comands.InfectedCommand;
+import io.github.itshaithamn.infection.teammanager.PlayerData;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandExecutor;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.Nullable;
 
 public class Main extends JavaPlugin implements Listener {
+    FileConfiguration config;
+
     @Override
     public void onEnable() {
+        ConfigurationSerialization.registerClass(PlayerData.class);
+        saveDefaultConfig();
+        this.config = getConfig();
+        saveConfig();
+
         Bukkit.getPluginManager().registerEvents(this, this);
         getCommand("infected").setExecutor(new InfectedCommand());
     }
@@ -22,6 +32,10 @@ public class Main extends JavaPlugin implements Listener {
     }
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
+    public void onPlayerJoinListener(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        PlayerData playerData = new PlayerData(player.getUniqueId(), "survivors");
+        config.set("players." + player.getUniqueId(),playerData);
+        saveConfig();
     }
 }
