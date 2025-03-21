@@ -35,7 +35,7 @@ public class Main extends JavaPlugin implements Listener {
     public void onPlayerJoinListener(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         PlayerData playerData = new PlayerData(player.getUniqueId(), "survivors");
-        config.set("players." + player.getUniqueId(),playerData);
+        config.set("infectionplayers." + player.getUniqueId(),playerData);
         saveConfig();
     }
 }

@@ -1,5 +1,7 @@
 package io.github.itshaithamn.infection.teammanager;
 
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.jetbrains.annotations.NotNull;
 
@@ -9,6 +11,7 @@ import java.util.UUID;
 
 public class PlayerData implements ConfigurationSerializable{
 
+    private FileConfiguration config;
     private UUID playerId;
     private String teamName;
 
