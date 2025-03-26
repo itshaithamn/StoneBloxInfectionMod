@@ -19,10 +19,6 @@ public class Initializer implements TeamManager {
         loadTeams();
     }
 
-    public Scoreboard getScoreboard() {
-        return scoreboard;
-    }
-
     private void loadTeams() {
         this.infected = getOrCreateTeam("infected");
         this.survivor = getOrCreateTeam("survivor");
@@ -68,13 +64,6 @@ public class Initializer implements TeamManager {
         return target != null;
     }
 
-    public void removePlayerInfected(Player player) {
-        this.infected.removeEntry(player.getName());
-    }
-
-    public void removePlayerSurvivors(Player player) {
-        this.survivor.removeEntry(player.getName());
-    }
 
     public Set<String> getScoreboardPlayers(String teamName) {
         Team team = null;

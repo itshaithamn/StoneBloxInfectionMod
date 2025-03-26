@@ -3,7 +3,7 @@ package io.github.itshaithamn.infection;
 import io.github.itshaithamn.infection.comands.InfectedCommand;
 import io.github.itshaithamn.infection.teammanager.ConfigSave;
 import io.github.itshaithamn.infection.teammanager.ConfigSaveInterface;
-import io.github.itshaithamn.infection.teammanager.PlayerData;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -15,6 +15,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 
 public class Main extends JavaPlugin implements Listener {
     private static File playerTeamStorageFile = new File("./plugins/InfectionModConfigFiles/playerInfectionDataFile.yml");
@@ -45,13 +46,17 @@ public class Main extends JavaPlugin implements Listener {
     public void onPlayerJoinListener(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-//       if player dne then execute new Player send message else do nothing but save config
-//        PlayerData playerData = new PlayerData(player.getUniqueId(), "survivor");
-//        playerTeamStorageConfig.set("infectionplayers." + player.getUniqueId(),playerData);
-//        player.sendMessage(Component.text("You are on the " + playerData + "Team!"));
-//        saveConfig();
-        ConfigSave = new ConfigSave(player.getUniqueId(), "survivor");
-        ConfigSave.save();
+//       if player new then execute new Player send message else do nothing but save config
+        if(!playerTeamStorageConfig.contains("players." + player.getUniqueId())) {
+            ConfigSave = new ConfigSave(player.getUniqueId(), "survivor");
+            ConfigSave.save();
+        } else {
+            String uuid = player.getUniqueId().toString();
+            String path = "players." + uuid + ".team";
+            player.sendMessage(Component.text("§1§lYou are on team: " + playerTeamStorageConfig.getString(path)));
+        }
+//        ConfigSave = new ConfigSave(player.getUniqueId(), "survivor");
+//        ConfigSave.save();
     }
 
     //Getters and Setters for playerTeamStorageConfig
