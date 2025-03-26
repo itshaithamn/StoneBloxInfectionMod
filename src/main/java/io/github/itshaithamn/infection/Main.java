@@ -66,6 +66,8 @@ public class Main extends JavaPlugin implements Listener {
                 case null:
                     player.sendMessage(Component.text("Weird ass error, you should be in a team...."));
                     break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + team);
             }
 
         }
