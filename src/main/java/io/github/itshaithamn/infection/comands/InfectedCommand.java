@@ -1,5 +1,6 @@
 package io.github.itshaithamn.infection.comands;
 
+import io.github.itshaithamn.infection.teammanager.ConfigSave;
 import io.github.itshaithamn.infection.teammanager.Initializer;
 import io.github.itshaithamn.infection.teammanager.TeamManager;
 import io.papermc.paper.chat.ChatRenderer;
@@ -23,10 +24,7 @@ public class InfectedCommand implements CommandExecutor, ChatRenderer {
         Player player = (Player) sender;
 
         if (!(sender instanceof Player)) {
-            Component playerName = Component.text(player.getName());
-            Component message = Component.text("You must be a player to use this command");
-            Audience audience = Audience.audience(player);
-            render(player, playerName, message, audience);
+            sender.sendMessage(Component.text("Only players can use this command"));
             return true;
         }
 

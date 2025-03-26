@@ -12,6 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +21,6 @@ import java.util.UUID;
 public class Main extends JavaPlugin implements Listener {
     private static File playerTeamStorageFile = new File("./plugins/InfectionModConfigFiles/playerInfectionDataFile.yml");
     private static FileConfiguration playerTeamStorageConfig = YamlConfiguration.loadConfiguration(playerTeamStorageFile);
-    private static ConfigSaveInterface ConfigSave;
 
     @Override
     public void onEnable() {
@@ -46,11 +46,12 @@ public class Main extends JavaPlugin implements Listener {
     public void onPlayerJoinListener(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         String uuid = player.getUniqueId().toString();
+//        Moved ConfigSaveInterface from a global to local variable
 //        Maybe add a if player.getString(path) == null then add player to path else send info message
 
 //       if player new then execute new Player send message else do nothing but save config
         if(!playerTeamStorageConfig.contains("players." + player.getUniqueId())) {
-            ConfigSave = new ConfigSave(player.getUniqueId(), "survivor");
+            ConfigSaveInterface ConfigSave = new ConfigSave(player.getUniqueId(), "survivor");
             ConfigSave.save();
         } else {
             player.sendMessage(Component.text("[INFO]§r §1§lYou are on team: " ));
@@ -58,10 +59,12 @@ public class Main extends JavaPlugin implements Listener {
             String team = playerTeamStorageConfig.getString(path);
             switch (team) {
                 case "survivor":
-                    player.sendMessage(Component.text("§asurvivor"));
+                    player.sendMessage(Component.text("§2 survivor"));
+                    player.addPotionEffect(PotionEffectType.SPEED.createEffect(999999999, 10));
                     break;
                 case "infected":
-                    player.sendMessage(Component.text("§minfected"));
+                    player.sendMessage(Component.text("§4 infected"));
+                    player.addPotionEffect(PotionEffectType.HUNGER.createEffect(999999999, 10));
                     break;
                 case null:
                     player.sendMessage(Component.text("Weird ass error, you should be in a team...."));

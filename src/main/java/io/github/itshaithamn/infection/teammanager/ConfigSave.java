@@ -24,4 +24,7 @@ public class ConfigSave implements ConfigSaveInterface{
         Main.savePlayerTeamStorageConfig(config);
     }
 
+    public FileConfiguration getConfig() {
+        return this.config;
+    }
 }

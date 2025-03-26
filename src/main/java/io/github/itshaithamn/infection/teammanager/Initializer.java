@@ -52,7 +52,9 @@ public class Initializer implements TeamManager {
         }
         team.addEntry(playerName);
         Player player = Bukkit.getPlayer(playerName);
-        if (player != null) {
+        ConfigSaveInterface ConfigSave = new ConfigSave(player.getUniqueId(), teamName);
+        ConfigSave.save();
+        if (player == null) {
             Bukkit.getLogger().info("Player '" + playerName + " was not found");
             return;
         }
