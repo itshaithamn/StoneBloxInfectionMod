@@ -45,15 +45,29 @@ public class Main extends JavaPlugin implements Listener {
     @EventHandler
     public void onPlayerJoinListener(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+        String uuid = player.getUniqueId().toString();
+//        Maybe add a if player.getString(path) == null then add player to path else send info message
 
 //       if player new then execute new Player send message else do nothing but save config
         if(!playerTeamStorageConfig.contains("players." + player.getUniqueId())) {
             ConfigSave = new ConfigSave(player.getUniqueId(), "survivor");
             ConfigSave.save();
         } else {
-            String uuid = player.getUniqueId().toString();
+            player.sendMessage(Component.text("[INFO]§r §1§lYou are on team: " ));
             String path = "players." + uuid + ".team";
-            player.sendMessage(Component.text("§1§lYou are on team: " + playerTeamStorageConfig.getString(path)));
+            String team = playerTeamStorageConfig.getString(path);
+            switch (team) {
+                case "survivor":
+                    player.sendMessage(Component.text("§asurvivor"));
+                    break;
+                case "infected":
+                    player.sendMessage(Component.text("§minfected"));
+                    break;
+                case null:
+                    player.sendMessage(Component.text("Weird ass error, you should be in a team...."));
+                    break;
+            }
+
         }
 //        ConfigSave = new ConfigSave(player.getUniqueId(), "survivor");
 //        ConfigSave.save();
