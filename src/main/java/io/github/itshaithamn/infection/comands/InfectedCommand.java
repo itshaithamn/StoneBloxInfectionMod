@@ -91,7 +91,7 @@ public class InfectedCommand implements CommandExecutor, ChatRenderer {
     }
 
     private void handleScoreboardCommand(Player player, String[] args) {
-        if (args.length < 3) {
+        if (args.length < 2) {
             player.sendMessage(Component.text("Usage: /infected list <team>"));
             return;
         }

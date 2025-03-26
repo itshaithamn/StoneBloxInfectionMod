@@ -5,7 +5,6 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 import java.util.Set;
-import java.util.UUID;
 
 public interface TeamManager {
     void addPlayertoTeam(String teamName, String player);
