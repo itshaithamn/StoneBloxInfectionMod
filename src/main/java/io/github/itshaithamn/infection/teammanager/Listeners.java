@@ -5,15 +5,15 @@ import io.github.itshaithamn.infection.Main;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.plugin.java.JavaPlugin;
 
-public class PotionListener implements Listener {
+public class Listeners implements Listener {
     private static FileConfiguration playerTeamStorageConfig = Main.getPlayerTeamStorageConfig();
 
 //    @EventHandler
@@ -35,14 +35,13 @@ public class PotionListener implements Listener {
             String team = playerTeamStorageConfig.getString(path);
             switch (team) {
                 case "survivor":
-                    player.sendMessage(Component.text("§2 survivor"));
-                    player.addPotionEffect(PotionEffectType.SPEED.createEffect(999999999, 10));
-                    player.removePotionEffect(PotionEffectType.HUNGER);
+                    player.sendMessage(Component.text("§2 >>survivor"));
+                    player.removePotionEffect(PotionEffectType.SPEED);
                     break;
                 case "infected":
                     player.sendMessage(Component.text("§4 infected"));
-                    player.addPotionEffect(PotionEffectType.HUNGER.createEffect(999999999, 10));
-                    player.removePotionEffect(PotionEffectType.SPEED);
+                    player.addPotionEffect(PotionEffectType.SPEED.createEffect(999999, 3));
+                    player.addPotionEffect(PotionEffectType.WEAKNESS.createEffect(999999, 1));
                     break;
                 case null:
                     player.sendMessage(Component.text("Weird ass error, you should be in a team...."));
@@ -51,6 +50,35 @@ public class PotionListener implements Listener {
                     throw new IllegalStateException("Unexpected value: " + team);
             }
         }, 5L);
+    }
+
+    @EventHandler
+    public void onAttack(EntityDamageByEntityEvent event) {
+        Player reciever;
+        Player attacker;
+        Entity affected = event.getEntity();
+        if(event.getDamager() instanceof Player && event.getEntity() instanceof Player) {
+            reciever = (Player) event.getDamager();
+            attacker = (Player) event.getEntity();
+        } else {
+            attacker = (Player) event.getDamager();
+            attacker.sendMessage(Component.text("[INFO] Working Debugged, no Bugs, I'm a shitty programmer" + affected.getName()));
+            return;
+        }
+
+        String uuidAttacker = attacker.getUniqueId().toString();
+        String pathAttacker = "players." + uuidAttacker + ".team";
+        String teamAttacker = playerTeamStorageConfig.getString(pathAttacker);
+
+        double damagebyAttacker = reciever.getLastDamage();
+
+        if (teamAttacker != null && teamAttacker.equals("infected") && damagebyAttacker >= 1) {
+            reciever.sendMessage(Component.text("You are infected!"));
+            playerTeamStorageConfig.set(reciever.getUniqueId().toString(), "infected");
+            ConfigSaveInterface ConfigSave = new ConfigSave(reciever.getUniqueId(), "infected");
+            ConfigSave.save();
+            attacker.sendMessage(Component.text("You have infected:" + reciever.getName()));
+        }
 
     }
 }

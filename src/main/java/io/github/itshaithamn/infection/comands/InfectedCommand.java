@@ -1,6 +1,5 @@
 package io.github.itshaithamn.infection.comands;
 
-import io.github.itshaithamn.infection.teammanager.ConfigSave;
 import io.github.itshaithamn.infection.teammanager.Initializer;
 import io.github.itshaithamn.infection.teammanager.TeamManager;
 import io.papermc.paper.chat.ChatRenderer;

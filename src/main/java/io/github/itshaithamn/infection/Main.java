@@ -3,7 +3,7 @@ package io.github.itshaithamn.infection;
 import io.github.itshaithamn.infection.comands.InfectedCommand;
 import io.github.itshaithamn.infection.teammanager.ConfigSave;
 import io.github.itshaithamn.infection.teammanager.ConfigSaveInterface;
-import io.github.itshaithamn.infection.teammanager.PotionListener;
+import io.github.itshaithamn.infection.teammanager.Listeners;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -12,7 +12,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffectType;
 
@@ -45,7 +44,7 @@ public class Main extends JavaPlugin implements Listener {
         saveConfig();
 
         Objects.requireNonNull(getCommand("infected")).setExecutor(new InfectedCommand());
-        getServer().getPluginManager().registerEvents(new PotionListener(), this);
+        getServer().getPluginManager().registerEvents(new Listeners(), this);
         Bukkit.getPluginManager().registerEvents(this, this);
     }
 
@@ -69,8 +68,6 @@ public class Main extends JavaPlugin implements Listener {
         if(!playerTeamStorageConfig.contains("players." + player.getUniqueId())) {
             ConfigSaveInterface ConfigSave = new ConfigSave(player.getUniqueId(), "survivor");
             ConfigSave.save();
-            player.addPotionEffect(PotionEffectType.SPEED.createEffect(999999999, 10));
-
             return;
         }
 
@@ -95,7 +92,6 @@ public class Main extends JavaPlugin implements Listener {
 //        ConfigSave = new ConfigSave(player.getUniqueId(), "survivor");
 //        ConfigSave.save();
     }
-
 
 
     //Getters and Setters for playerTeamStorageConfig

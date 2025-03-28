@@ -1,7 +1,5 @@
 package io.github.itshaithamn.infection.teammanager;
 
-import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 import java.util.Set;
