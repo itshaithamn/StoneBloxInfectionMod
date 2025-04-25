@@ -2,6 +2,7 @@ package io.github.itshaithamn.infection.test;
 
 
 import io.github.itshaithamn.infection.Main;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,8 +10,7 @@ import org.mockbukkit.mockbukkit.MockBukkit;
 import org.mockbukkit.mockbukkit.ServerMock;
 import org.mockbukkit.mockbukkit.entity.PlayerMock;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class HelloWorldTest {
     private ServerMock server;
@@ -34,5 +34,25 @@ public class HelloWorldTest {
         // Verify the plugin is loaded and enabled
         assertNotNull(plugin, "Plugin should not be null");
         assertTrue(plugin.isEnabled(), "Plugin should be enabled");
+    }
+
+    @Test
+    void testInfectedPlayerInfectsSurvivor() {
+        // Create mock players
+        PlayerMock infected = server.addPlayer();
+        PlayerMock survivor = server.addPlayer();
+
+        // Set initial team states in config
+        FileConfiguration config = Main.getPlayerTeamStorageConfig();
+        config.set("players." + infected.getUniqueId() + ".team", "infected");
+        config.set("players." + survivor.getUniqueId() + ".team", "survivor");
+        Main.savePlayerTeamStorageConfig(config); // Save changes
+
+        // Simulate attack interaction
+        infected.attack(survivor);
+
+        // Verify infection transmission
+        String survivorTeam = config.getString("players." + survivor.getUniqueId() + ".team");
+        assertEquals("infected", survivorTeam, "Survivor should become infected after attack");
     }
 }

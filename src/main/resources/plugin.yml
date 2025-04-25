@@ -10,3 +10,17 @@ commands:
       - infected
       - zombies
       - i
+
+permissions:
+  infection.command.infected:
+    description: Allows the player to use the /infected command.
+    default: op
+  infection.command.team:
+    description: Allows the player to add players to teams using /infected team.
+    default: op
+  infection.command.rmteam:
+    description: Allows the player to remove players from teams using /infected rmteam.
+    default: op
+  infection.command.list:
+    description: Allows the player to list players in a team using /infected list.
+    default: true

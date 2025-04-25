@@ -43,6 +43,16 @@ public class Main extends JavaPlugin implements Listener {
         playerTeamStorageConfig = getConfig();
         saveConfig();
 
+        Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
+
+            @Override
+            public void run() {
+                for(Player player : Bukkit.getOnlinePlayers()){
+                    Listeners.TeamCheckListener(player);
+                }
+            }
+        }, 0, 1L);
+
         Objects.requireNonNull(getCommand("infected")).setExecutor(new InfectedCommand());
         getServer().getPluginManager().registerEvents(new Listeners(), this);
         Bukkit.getPluginManager().registerEvents(this, this);
@@ -52,47 +62,6 @@ public class Main extends JavaPlugin implements Listener {
     public void onDisable() {
         Bukkit.getPluginManager().disablePlugin(this);
     }
-
-
-    //This method will eventually need to be severly altered to prevent players from rejoining to gain speed buff, bug
-    // Actually, players will still spawn with their respective teams, however, this buff will stil initialze everytime
-//    They join making it a unecessary resource, however, it might be okay in terms of server pop, unimportant, fixable bug
-    @EventHandler
-    public void onPlayerJoinListener(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        String uuid = player.getUniqueId().toString();
-//        Moved ConfigSaveInterface from a global to local variable
-//        Maybe add a if player.getString(path) == null then add player to path else send info message
-
-//       if player new then execute new Player send message else do nothing but save config
-        if(!playerTeamStorageConfig.contains("players." + player.getUniqueId())) {
-            ConfigSaveInterface ConfigSave = new ConfigSave(player.getUniqueId(), "survivor");
-            ConfigSave.save();
-            return;
-        }
-
-        player.sendMessage(Component.text("[INFO]§r §1§lYou are on team: " ));
-        String path = "players." + uuid + ".team";
-        String team = playerTeamStorageConfig.getString(path);
-        switch (team) {
-            case "survivor":
-                player.sendMessage(Component.text("§2 survivor"));
-                player.addPotionEffect(PotionEffectType.SPEED.createEffect(999999999, 10));
-                break;
-            case "infected":
-                player.sendMessage(Component.text("§4 infected"));
-                player.addPotionEffect(PotionEffectType.HUNGER.createEffect(999999999, 10));
-                break;
-            case null:
-                player.sendMessage(Component.text("Weird ass error, you should be in a team...."));
-                break;
-            default:
-                throw new IllegalStateException("Unexpected value: " + team);
-        }
-//        ConfigSave = new ConfigSave(player.getUniqueId(), "survivor");
-//        ConfigSave.save();
-    }
-
 
     //Getters and Setters for playerTeamStorageConfig
     public static FileConfiguration getPlayerTeamStorageConfig () {
