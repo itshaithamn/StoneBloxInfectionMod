@@ -9,7 +9,6 @@ commands:
     aliases:
       - infected
       - zombies
-      - i
 
 permissions:
   infection.command.infected:

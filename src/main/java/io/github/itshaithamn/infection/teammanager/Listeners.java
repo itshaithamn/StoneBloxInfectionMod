@@ -8,23 +8,17 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.List;
+
+
 public class Listeners implements Listener {
-    private static FileConfiguration playerTeamStorageConfig = Main.getPlayerTeamStorageConfig();
-
-//    @EventHandler
-//    public void onPlayerDeath(PlayerDeathEvent event) {
-//        Player player = event.getPlayer();
-//        player.sendMessage(Component.text("[INFO]§r §1§lYou are on team: " ));
-//        String uuid = player.getUniqueId().toString();
-//        String path = "players." + uuid + ".team";
-//        String team = this.playerTeamStorageConfig.getString(path);
-//    }
-
+    private static FileConfiguration config = Main.getPlayerTeamStorageConfig();
+    private static TeamManager teamManager = new Initializer();
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Bukkit.getScheduler().runTaskLater(Main.getInstance(), task -> {
@@ -32,7 +26,7 @@ public class Listeners implements Listener {
             player.sendMessage(Component.text("[INFO]§r §1§lYou are on team: " ));
             String uuid = player.getUniqueId().toString();
             String path = "players." + uuid + ".team";
-            String team = playerTeamStorageConfig.getString(path);
+            String team = config.getString(path);
             assert team != null;
             player.sendMessage(Component.text(team));
             TeamCheckListener(player);
@@ -40,28 +34,29 @@ public class Listeners implements Listener {
     }
 
     @EventHandler
-    public void onAttack(EntityDamageByEntityEvent event) {
-        Player reciever;
-        Player attacker;
-        if(event.getDamager() instanceof Player && event.getEntity() instanceof Player) {
-            reciever = (Player) event.getEntity();
-            attacker = (Player) event.getDamager();
+    public void onKill(PlayerDeathEvent event) {
+        Player killed;
+        Player killer;
+        if(event.getEntity().getKiller() instanceof Player && event.getEntity() instanceof Player) {
+            killed = event.getEntity();
+            killer = event.getEntity().getKiller();
         } else {
             return;
         }
 
-        String uuidAttacker = attacker.getUniqueId().toString();
-        String pathAttacker = "players." + uuidAttacker + ".team";
-        String teamAttacker = playerTeamStorageConfig.getString(pathAttacker);
+        String uuidKiller = killer.getUniqueId().toString();
+        String pathKiller = "players." + uuidKiller + ".team";
+        String teamKiller = config.getString(pathKiller);
 
-        double damagebyAttacker = reciever.getLastDamage();
+        String uuidKilled = killed.getUniqueId().toString();
+        String pathKilled = "players." + uuidKilled + ".team";
+        String teamKilled = config.getString(pathKiller);
 
-        if (teamAttacker != null && teamAttacker.equals("infected") && damagebyAttacker >= 20) {
-            reciever.sendMessage(Component.text("§1§lYou are infected!"));
-            playerTeamStorageConfig.set(reciever.getUniqueId().toString(), "infected");
-            ConfigSaveInterface ConfigSave = new ConfigSave(reciever.getUniqueId(), "infected");
-            ConfigSave.save();
-            attacker.sendMessage(Component.text("§1§lYou have infected:§r " + reciever.getName()));
+
+        if (teamKiller != null && teamKiller.equals("infected")) {
+            saveKill(uuidKiller, uuidKilled);
+            teamManager.addPlayertoTeam(killed, teamKilled);
+            killer.sendMessage(Component.text("§1§lYou have infected:§r " + killer.getName()));
         }
     }
 
@@ -73,35 +68,25 @@ public class Listeners implements Listener {
 //        Maybe add a if player.getString(path) == null then add player to path else send info message
 
 //       if player new then execute new Player send message else do nothing but save config
-        if(!playerTeamStorageConfig.contains("players." + player.getUniqueId())) {
-            ConfigSaveInterface ConfigSave = new ConfigSave(player.getUniqueId(), "survivor");
-            ConfigSave.save();
+        if(!config.contains("players." + player.getUniqueId())) {
+            save(uuid, "survivor");
             return;
         }
 
         player.sendMessage(Component.text("[INFO]§r §1§lYou are on team: " ));
         String path = "players." + uuid + ".team";
-        String team = playerTeamStorageConfig.getString(path);
+        String team = config.getString(path);
+        assert team != null;
         player.sendMessage(Component.text(team));
-
+        teamManager.addPlayertoTeam(player, team);
         TeamCheckListener(player);
     }
 
-//    Can probably dumb down all the issues I've been having into this right here creating one listener for everything that just always runs
     public static void TeamCheckListener(Player player){
         String uuid = player.getUniqueId().toString();
-//        Moved ConfigSaveInterface from a global to local variable
-//        Maybe add a if player.getString(path) == null then add player to path else send info message
-
-//       if player new then execute new Player send message else do nothing but save config
-        if(!playerTeamStorageConfig.contains("players." + player.getUniqueId())) {
-            ConfigSaveInterface ConfigSave = new ConfigSave(player.getUniqueId(), "survivor");
-            ConfigSave.save();
-            return;
-        }
 
         String path = "players." + uuid + ".team";
-        String team = playerTeamStorageConfig.getString(path);
+        String team = config.getString(path);
         switch (team) {
             case "survivor":
 //                    Might be better to add a check here instead of doing all this
@@ -110,15 +95,32 @@ public class Listeners implements Listener {
                 player.setMaxHealth(20);
                 break;
             case "infected":
-                player.addPotionEffect(PotionEffectType.SPEED.createEffect(999999, 3));
-                player.addPotionEffect(PotionEffectType.STRENGTH.createEffect(999999, 2));
-                player.setMaxHealth(12);
+                player.addPotionEffect(PotionEffectType.SPEED.createEffect(999999, 2));
+                player.addPotionEffect(PotionEffectType.STRENGTH.createEffect(999999, 1));
+                player.setMaxHealth(8);
                 break;
             case null:
                 player.sendMessage(Component.text("Weird ass error, you should be in a team...."));
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + team);
+        }
+    }
+
+    public void save(String playerId, String teamName) {
+        config.set("players." + playerId + ".team", teamName);
+        Main.savePlayerTeamStorageConfig(config);
+    }
+
+    public void saveKill(String playerKiller, String playerKilled) {
+        String path = "players." + playerKiller + ".kills";
+        List<String> kills = config.getStringList(path);
+
+        if (!kills.contains(playerKilled)) {
+            kills.add(playerKilled);
+            config.set("players." + playerKiller + ".kills", kills);
+            config.set("players." + playerKilled + ".team", "infected");
+            Main.savePlayerTeamStorageConfig(config);
         }
     }
 }

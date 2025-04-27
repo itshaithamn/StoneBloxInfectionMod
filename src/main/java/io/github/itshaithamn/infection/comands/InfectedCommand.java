@@ -28,7 +28,6 @@ public class InfectedCommand implements CommandExecutor, ChatRenderer {
         }
 
         if (args.length == 0) {
-            handleInfectedCommand(player);
             return true;
         }
 
@@ -38,13 +37,24 @@ public class InfectedCommand implements CommandExecutor, ChatRenderer {
 
         switch (args[0].toLowerCase()) {
             case "rmteam":
-                handleTeamRemovalCommand(player, args);
+                if(player.hasPermission("infection.command.rmteam")) {
+                    handleTeamRemovalCommand(player, args);
+                }
+                player.sendMessage(Component.text("§c§lNo permission to use this command"));
                 return true;
             case "team":
-                handleTeamCommand(player, args);
+                if(player.hasPermission("infection.command.team")) {
+                    handleTeamCommand(player, args);
+                } else {
+                    player.sendMessage(Component.text("§c§lNo permission to use this command"));
+                }
                 return true;
             case "list":
-                handleScoreboardCommand(player, args);
+                if(player.hasPermission("infection.command.list")) {
+                    handleScoreboardCommand(player, args);
+                } else {
+                    player.sendMessage(Component.text("§c§lNo permission to use this command"));
+                }
                 return true;
         }
 
@@ -56,11 +66,6 @@ public class InfectedCommand implements CommandExecutor, ChatRenderer {
         return sourceDisplayName
                 .append(Component.text(": "))
                 .append(message);
-    }
-
-    private void handleInfectedCommand(Player player) {
-        Bukkit.broadcast(Component.text("§c§lThere are infected among you. . . ."));
-
     }
 
     private void handleTeamCommand(Player player, String[] args) {
@@ -82,7 +87,7 @@ public class InfectedCommand implements CommandExecutor, ChatRenderer {
             return;
         }
 
-        teamManager.addPlayertoTeam(teamName, target.getName());
+        teamManager.addPlayertoTeam(target, teamName);
         target.sendMessage(Component.text("You are now part of the " + teamName + " team."));
         player.sendMessage(Component.text("Player " + target.getName() + " has been added to the " + teamName + " team."));
     }

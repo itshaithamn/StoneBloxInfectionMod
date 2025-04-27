@@ -1,6 +1,8 @@
 package io.github.itshaithamn.infection.teammanager;
 
+import io.github.itshaithamn.infection.Main;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
@@ -12,11 +14,12 @@ public class Initializer implements TeamManager {
     private Team infected;
     private Team survivor;
 
+    private static FileConfiguration config = Main.getPlayerTeamStorageConfig();
 
     public Initializer() {
-        Bukkit.getLogger().info("§aInitializing teams...");
-        this.scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
-        loadTeams();
+        this.scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+        this.infected  = getOrCreateTeam("infected");
+        this.survivor  = getOrCreateTeam("survivor");
     }
 
     private void loadTeams() {
@@ -40,25 +43,24 @@ public class Initializer implements TeamManager {
         return survivor;
     }
 
-    public void addPlayertoTeam(String teamName, String playerName) {
-        Team team = this.scoreboard.getTeam(teamName);
-        if (team == null) {
-            Bukkit.getLogger().warning("Team '" + teamName + "' does not exist.");
+    @Override
+    public void addPlayertoTeam(Player player, String teamName) {
+        Team t = scoreboard.getTeam(teamName);
+        if (t == null) {
+            Bukkit.getLogger().warning("No such team: "+teamName);
             return;
         }
-        if (team.hasEntry(playerName)) {
-            Bukkit.getLogger().info("Player '" + playerName + "' is already on team '" + teamName + "'.");
-            return;
+        // assign the player to the scoreboard
+        player.setScoreboard(scoreboard);
+        // only add if they’re not already in it
+        if (!t.hasEntry(player.getName())) {
+            t.addEntry(player.getName());
         }
-        team.addEntry(playerName);
-        Player player = Bukkit.getPlayer(playerName);
-        ConfigSaveInterface ConfigSave = new ConfigSave(player.getUniqueId(), teamName);
-        ConfigSave.save();
-        if (player == null) {
-            Bukkit.getLogger().info("Player '" + playerName + " was not found");
-            return;
-        }
-        Bukkit.getLogger().info("Added player '" + playerName + "' to team '" + teamName + "'.");
+        // persist to config
+        FileConfiguration cfg = Main.getPlayerTeamStorageConfig();
+        cfg.set("players."+player.getUniqueId()+".team", teamName);
+        Main.savePlayerTeamStorageConfig(cfg);
+        Bukkit.getLogger().info("Added " + player.getName() + " to " + teamName);
     }
 
     public boolean verifyPlayer(String player) {
@@ -77,5 +79,10 @@ public class Initializer implements TeamManager {
 
 //        Must check if getEntries is not null by checking the team
         return team.getEntries();
+    }
+
+    public void save(String playerId, String teamName) {
+        config.set("players." + playerId + ".team", teamName);
+        Main.savePlayerTeamStorageConfig(config);
     }
 }
