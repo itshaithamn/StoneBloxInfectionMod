@@ -1,14 +1,16 @@
-name: HelloWorld
+name: sbinfection
 version: 1.0.0
 main: io.github.itshaithamn.infection.Main
 api-version: 1.20
+depend: [TAB]
 
 commands:
   infection:
-    description: Starts the infection gamemode
+    description: root command
     aliases:
       - infected
       - zombies
+
 
 permissions:
   infection.command.infected:
@@ -21,5 +23,8 @@ permissions:
     description: Allows the player to remove players from teams using /infected rmteam.
     default: op
   infection.command.list:
-    description: Allows the player to list players in a team using /infected list.
+    description: Allows the player to list players in a team using /infected list. (no longer working)
+    default: true
+  infection.command.kills:
+    description: Allows the player to list top player kills
     default: true

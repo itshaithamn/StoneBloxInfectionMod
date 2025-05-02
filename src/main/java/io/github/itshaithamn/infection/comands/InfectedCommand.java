@@ -1,6 +1,7 @@
 package io.github.itshaithamn.infection.comands;
 
 import io.github.itshaithamn.infection.teammanager.Initializer;
+import io.github.itshaithamn.infection.teammanager.Listeners;
 import io.github.itshaithamn.infection.teammanager.TeamManager;
 import io.papermc.paper.chat.ChatRenderer;
 import net.kyori.adventure.audience.Audience;
@@ -13,6 +14,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public class InfectedCommand implements CommandExecutor, ChatRenderer {
@@ -29,10 +32,6 @@ public class InfectedCommand implements CommandExecutor, ChatRenderer {
 
         if (args.length == 0) {
             return true;
-        }
-
-        if (args.length < 2) {
-            player.sendMessage(Component.text("§c§l[ERROR]§r: Usage -> /infection team <'survivor' or 'infected'> <player> \n-> /infection rmteam <team> <player>"));
         }
 
         switch (args[0].toLowerCase()) {
@@ -53,12 +52,32 @@ public class InfectedCommand implements CommandExecutor, ChatRenderer {
                 if(player.hasPermission("infection.command.list")) {
                     handleScoreboardCommand(player, args);
                 } else {
-                    player.sendMessage(Component.text("§c§lNo permission to use this command"));
+                    player.sendMessage(Component.text("§c§lNo Permission?? Contact a dev with phrase infection.command.list!"));
                 }
                 return true;
-        }
+            case "kills":
+                if(player.hasPermission("infection.command.kills")) {
+                    String playerUser = args[1];
+                    if(args[1].equals("top")) {
+                        //find top
+                        Listeners.getTop(player);
+                    } else {
+                        try {
+                            Listeners.getKills(Objects.requireNonNull(Bukkit.getPlayer(playerUser)));
+                        } catch (NullPointerException e) {
+                            e.printStackTrace();
+                            player.sendMessage("Player §c§l" + playerUser + "§r not found");
+                        }
+                    }
+                } else {
+                    player.sendMessage(Component.text("§c§lNo Permission?? Contact a dev with phrase infection.command.kill!"));
 
-        return true;
+                }
+                return true;
+            default:
+                player.sendMessage(Component.text("§c§lDNE"));
+                return true;
+        }
     }
 
     @Override
@@ -71,7 +90,7 @@ public class InfectedCommand implements CommandExecutor, ChatRenderer {
     private void handleTeamCommand(Player player, String[] args) {
 //        You need team, then you need a player to add to that team
         if (args.length < 3) {
-            player.sendMessage(Component.text("Usage: /infected team <team> <player>"));
+            player.sendMessage(Component.text("Usage: /infection team <team> <player>"));
             return;
         }
 
@@ -93,17 +112,12 @@ public class InfectedCommand implements CommandExecutor, ChatRenderer {
     }
 
     private void handleScoreboardCommand(Player player, String[] args) {
-        if (args.length < 2) {
-            player.sendMessage(Component.text("Usage: /infected list <team>"));
-            return;
-        }
-
-        Set<String> List = teamManager.getScoreboardPlayers(args[1]);
+        Set<String> List = teamManager.getScoreboardPlayers("infected");
         String playerList = List.isEmpty()
                 ? "No players in this team."
                 : String.join(", ", List);
 
-        player.sendMessage(Component.text("Players: " + playerList));
+        player.sendMessage(Component.text("§c§l[Infection Event]§r §2§lInfected§r §lplayers: §r" + playerList));
     }
 
     //Unneccesary code, this is for removing a player entirely from the game

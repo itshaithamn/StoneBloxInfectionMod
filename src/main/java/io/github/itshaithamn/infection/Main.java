@@ -1,13 +1,16 @@
 package io.github.itshaithamn.infection;
 
 import io.github.itshaithamn.infection.comands.InfectedCommand;
+import io.github.itshaithamn.infection.teammanager.Initializer;
 import io.github.itshaithamn.infection.teammanager.Listeners;
+import io.github.itshaithamn.infection.teammanager.TeamManager;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -28,24 +31,22 @@ public class Main extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
-        if(!playerTeamStorageFile.exists()) {
-            saveResource("playerInfectionDataFile.yml", false);
-        }
+        TeamManager teamManager = new Initializer();
+
 
 //        ConfigurationSerialization.registerClass(PlayerData.class);
 //        saveDefaultConfig();
-        playerTeamStorageConfig = getConfig();
+//        playerTeamStorageConfig = getConfig();
         saveConfig();
-
         Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
-
             @Override
             public void run() {
                 for(Player player : Bukkit.getOnlinePlayers()){
+
                     Listeners.TeamCheckListener(player);
                 }
             }
-        }, 0, 1L);
+        }, 5L, 20L);
 
         Objects.requireNonNull(getCommand("infected")).setExecutor(new InfectedCommand());
         getServer().getPluginManager().registerEvents(new Listeners(), this);
@@ -62,9 +63,6 @@ public class Main extends JavaPlugin implements Listener {
         return playerTeamStorageConfig;
     }
 
-    public static File getPlayerTeamStorageFile() {
-        return playerTeamStorageFile;
-    }
 
     public static void savePlayerTeamStorageConfig(FileConfiguration playerTeamStorageConfig) {
         try {

@@ -1,2 +1,1 @@
-rootProject.name = "StoneBlox_InfectionGameMode"
-
+rootProject.name = "StoneBox-InfectionEvent"

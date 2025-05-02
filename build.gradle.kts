@@ -7,18 +7,20 @@ plugins {
 }
 
 repositories {
-    mavenCentral()
     maven {
         name = "papermc"
         url = uri("https://repo.papermc.io/repository/maven-public/")
     }
+    maven { url = uri("https://jitpack.io") }
 }
 
 dependencies {
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation ("org.mockbukkit.mockbukkit:mockbukkit-v1.21:4.34.1")
+    testImplementation("com.github.seeseemelk:MockBukkit:2.32.0")
     compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
+    compileOnly("com.github.NEZNAMY:TAB-API:5.2.0")
 }
 
 java {

@@ -14,7 +14,8 @@ public class Initializer implements TeamManager {
     private Team infected;
     private Team survivor;
 
-    private static FileConfiguration config = Main.getPlayerTeamStorageConfig();
+    static Main main = Main.getInstance();
+    private static FileConfiguration config = main.getPlayerTeamStorageConfig();
 
     public Initializer() {
         this.scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
@@ -51,7 +52,6 @@ public class Initializer implements TeamManager {
             return;
         }
         // assign the player to the scoreboard
-        player.setScoreboard(scoreboard);
         // only add if they’re not already in it
         if (!t.hasEntry(player.getName())) {
             t.addEntry(player.getName());
