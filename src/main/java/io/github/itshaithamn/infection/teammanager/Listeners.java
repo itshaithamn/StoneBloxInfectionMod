@@ -2,9 +2,6 @@ package io.github.itshaithamn.infection.teammanager;
 
 
 import io.github.itshaithamn.infection.Main;
-import me.neznamy.tab.api.TabAPI;
-import me.neznamy.tab.api.TabPlayer;
-import me.neznamy.tab.api.nametag.NameTagManager;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -124,14 +121,6 @@ public class Listeners implements Listener {
         String path = "players." + uuid + ".team";
         String team = config.getString(path);
 
-        TabAPI tabApi = TabAPI.getInstance();
-        TabPlayer tabPlayer = null;
-        try {
-            tabPlayer = tabApi.getPlayer(player.getUniqueId());
-        } catch (NullPointerException e) {
-            Bukkit.getLogger().info("TabPlayer not found, player UUID does not exist?" + player.getUniqueId() + "with username " + playerName);
-        }
-        NameTagManager ntm = tabApi.getNameTagManager();
 
         Team infected = teamManager.getInfectedTeam();
         Team survivor = teamManager.getSurvivorsTeam();
@@ -151,7 +140,6 @@ public class Listeners implements Listener {
                 }
                 infected.removeEntry(player.getName());
                 survivor.addEntry(player.getName());
-                ntm.setPrefix(tabPlayer, "§l[§r§9Survivor§r§l]§r ");
                 player.setMaxHealth(20);
                 break;
             case "infected":
@@ -159,7 +147,6 @@ public class Listeners implements Listener {
                 player.addPotionEffect(PotionEffectType.STRENGTH.createEffect(999999, 1));
                 survivor.removeEntry(player.getName());
                 infected.addEntry(player.getName());
-                ntm.setPrefix(tabPlayer, "§l[§r§aInfected§r§l]§r ");
                 player.setMaxHealth(12);
                 break;
             case null:
